@@ -3,11 +3,10 @@ import { Trash2, RotateCcw, Pencil } from 'lucide-react';
 import { Timer } from '../types/timer';
 import { formatTime } from '../utils/time';
 import { useTimerStore } from '../store/useTimerStore';
-import { toast } from 'sonner';
-import { TimerAudio } from '../utils/audio';
 import { TimerControls } from './TimerControls';
 import { TimerProgress } from './TimerProgress';
 import { TimerModal } from './TimerModal';
+import { useAlarm } from '../hooks/useAlarm';
 
 interface TimerItemProps {
   timer: Timer;
@@ -15,9 +14,9 @@ interface TimerItemProps {
 
 export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
   const { toggleTimer, deleteTimer, updateTimer, restartTimer } = useTimerStore();
+  const { startAlarm, stopAlarm } = useAlarm();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const intervalRef = useRef<number | null>(null);
-  const timerAudio = TimerAudio.getInstance();
   const hasEndedRef = useRef(false);
 
   useEffect(() => {
@@ -27,35 +26,26 @@ export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
         
         if (timer.remainingTime <= 1 && !hasEndedRef.current) {
           hasEndedRef.current = true;
-
-          if (!timerAudio.getIsPlaying()) {
-          timerAudio.play().catch(console.error);
-          }
-          
-          toast.success(`Timer "${timer.title}" has ended!`, {
-            duration: Infinity,
-            action: {
-              label: 'Dismiss',
-              onClick: () => {
-                timerAudio.stop();
-                toast.dismiss()
-              },
-            },
-          });
+          startAlarm(timer.id, timer.title);
         }
       }, 1000);
     }
 
     return () => clearInterval(intervalRef.current!);
-  }, [timer.isRunning, timer.id, timer.remainingTime, timer.title, timerAudio, updateTimer]);
+  }, [timer.isRunning, timer.id, timer.remainingTime, timer.title, startAlarm, updateTimer]);
 
   const handleRestart = () => {
     hasEndedRef.current = false;
+    if (timer.isPlayingAlarm) {
+      stopAlarm(timer.id);
+    }
     restartTimer(timer.id);
   };
 
   const handleDelete = () => {
-    timerAudio.stop();
+    if (timer.isPlayingAlarm) {
+      stopAlarm(timer.id);
+    }
     deleteTimer(timer.id);
   };
 

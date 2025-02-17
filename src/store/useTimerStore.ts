@@ -48,6 +48,18 @@ const timerSlice = createSlice({
         timer.isRunning = false;
       }
     },
+    setAlarmPlaying: (state, action) => {
+      const timer = state.timers.find(timer => timer.id === action.payload);
+      if (timer) {
+        timer.isPlayingAlarm = true;
+      }
+    },
+    stopAlarmPlaying: (state, action) => {
+      const timer = state.timers.find(timer => timer.id === action.payload);
+      if (timer) {
+        timer.isPlayingAlarm = false;
+      }
+    },
   },
 });
 
@@ -64,6 +76,8 @@ export const {
   updateTimer,
   restartTimer,
   editTimer,
+  setAlarmPlaying,
+  stopAlarmPlaying,
 } = timerSlice.actions;
 
 export const useTimerStore = () => {
@@ -78,5 +92,7 @@ export const useTimerStore = () => {
     updateTimer: (id: string) => dispatch(updateTimer(id)),
     restartTimer: (id: string) => dispatch(restartTimer(id)),
     editTimer: (id: string, updates: Partial<Timer>) => dispatch(editTimer({ id, updates })),
+    setAlarmPlaying: (id: string) => dispatch(setAlarmPlaying(id)),
+    stopAlarmPlaying: (id: string) => dispatch(stopAlarmPlaying(id)),
   };
 };
