@@ -14,7 +14,7 @@ function Home() {
         <div className="flex items-center justify-between"  >
           <div className="flex items-center gap-3">
             <Clock className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Timer</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Timer App</h1>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
