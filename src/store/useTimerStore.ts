@@ -1,6 +1,7 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { Timer } from '../types/timer';
+import { useEffect } from 'react';
 
 const initialState = {
   timers: [] as Timer[],
@@ -10,24 +11,33 @@ const timerSlice = createSlice({
   name: 'timer',
   initialState,
   reducers: {
+    setTimers: (state, action) => {
+      state.timers = action.payload;
+    },
     addTimer: (state, action) => {
-      state.timers.push({
+      const newTimers = [...state.timers, {
         ...action.payload,
         id: crypto.randomUUID(),
         createdAt: Date.now(),
-      });
+      }];
+      state.timers = newTimers;
+      persistTimers(newTimers);
     },
     deleteTimer: (state, action) => {
-      state.timers = state.timers.filter(timer => timer.id !== action.payload);
+      const newTimers = state.timers.filter(timer => timer.id !== action.payload);
+      state.timers = newTimers;
+      persistTimers(newTimers);
     },
     toggleTimer: (state, action) => {
       const timer = state.timers.find(timer => timer.id === action.payload);
       if (timer) {
         timer.isRunning = !timer.isRunning;
+        persistTimers(state.timers);
       }
     },
     updateTimer: (state, action) => {
       const timer = state.timers.find(timer => timer.id === action.payload);
+      console.log('timer', timer);
       if (timer && timer.isRunning) {
         timer.remainingTime -= 1;
         timer.isRunning = timer.remainingTime > 0;
@@ -38,6 +48,7 @@ const timerSlice = createSlice({
       if (timer) {
         timer.remainingTime = timer.duration;
         timer.isRunning = false;
+        persistTimers(state.timers);
       }
     },
     editTimer: (state, action) => {
@@ -46,6 +57,7 @@ const timerSlice = createSlice({
         Object.assign(timer, action.payload.updates);
         timer.remainingTime = action.payload.updates.duration || timer.duration;
         timer.isRunning = false;
+        persistTimers(state.timers);
       }
     },
     setAlarmPlaying: (state, action) => {
@@ -76,6 +88,7 @@ export const {
   updateTimer,
   restartTimer,
   editTimer,
+  setTimers,
   setAlarmPlaying,
   stopAlarmPlaying,
 } = timerSlice.actions;
@@ -83,6 +96,13 @@ export const {
 export const useTimerStore = () => {
   const dispatch = useDispatch();
   const timers = useSelector((state: { timers: Timer[] }) => state.timers);
+
+  useEffect(() => {
+    const timersFromLocalStorage = localStorage.getItem('timers');
+    if (timersFromLocalStorage && !timers.length) {
+      dispatch(setTimers(JSON.parse(timersFromLocalStorage)));
+    }
+  }, [dispatch, timers.length]);
 
   return {
     timers,
@@ -96,3 +116,7 @@ export const useTimerStore = () => {
     stopAlarmPlaying: (id: string) => dispatch(stopAlarmPlaying(id)),
   };
 };
+
+const persistTimers = (timers: Timer[]) => {
+  localStorage.setItem('timers', JSON.stringify(timers));
+}
