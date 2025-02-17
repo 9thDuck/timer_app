@@ -226,7 +226,6 @@ export const TimerModal: React.FC<TimerModalProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={!isTitleValid || !isTimeValid}
             >
               {mode === 'edit' ? 'Save Changes' : 'Add Timer'}
             </Button>
