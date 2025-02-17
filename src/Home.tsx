@@ -1,20 +1,21 @@
 import { useState } from 'react';
 import { Plus, Clock } from 'lucide-react';
 import { TimerList } from './components/TimerList';
-import { AddTimerModal } from './components/AddTimerModal';
 import { Toaster } from 'sonner';
+import { TimerModal } from './components/TimerModal';
+import { useToastPosition } from './hooks/useToastPosition';
 
 function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const toastPosition = useToastPosition();
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Toaster position="top-right" />
+      <Toaster position={toastPosition} />
       <div className="container mx-auto px-4 py-8">
-        <div>
+        <div className="flex items-center justify-between"  >
           <div className="flex items-center gap-3">
             <Clock className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Timer</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Timer App</h1>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
@@ -27,9 +28,10 @@ function Home() {
         
         <TimerList />
         
-        <AddTimerModal
+        <TimerModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          mode="add"
         />
       </div>
     </div>
