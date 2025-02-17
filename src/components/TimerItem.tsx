@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Trash2, RotateCcw, Pencil } from 'lucide-react';
 import { Timer } from '../types/timer';
 import { formatTime } from '../utils/time';
@@ -6,48 +6,36 @@ import { useTimerStore } from '../store/useTimerStore';
 import { TimerControls } from './TimerControls';
 import { TimerProgress } from './TimerProgress';
 import { TimerModal } from './TimerModal';
-import { useAlarm } from '../hooks/useAlarm';
 import { Button } from './Button';
 
 interface TimerItemProps {
   timer: Timer;
+  stopAlarm: (timerId: string) => void;
 }
 
-export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
-  const { toggleTimer, deleteTimer, updateTimer, restartTimer } = useTimerStore();
-  const { startAlarm, stopAlarm } = useAlarm();
+export const TimerItem: React.FC<TimerItemProps> = ({ timer, stopAlarm }) => {
+  const { toggleTimer, deleteTimer, restartTimer, stopAlarmPlaying } = useTimerStore();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const intervalRef = useRef<number | null>(null);
   const hasEndedRef = useRef(false);
-
-  useEffect(() => {
-    if (timer.isRunning) {
-      intervalRef.current = window.setInterval(() => {
-        updateTimer(timer.id);
-        
-        if (timer.remainingTime <= 1 && !hasEndedRef.current) {
-          hasEndedRef.current = true;
-          startAlarm(timer.id, timer.title);
-        }
-      }, 1000);
-    }
-
-    return () => clearInterval(intervalRef.current!);
-  }, [timer.isRunning, timer.id, timer.remainingTime, timer.title, startAlarm, updateTimer]);
 
   const handleRestart = () => {
     hasEndedRef.current = false;
-    if (timer.isPlayingAlarm) {
-      stopAlarm(timer.id);
-    }
     restartTimer(timer.id);
   };
 
   const handleDelete = () => {
     if (timer.isPlayingAlarm) {
+      // First stop the alarm and audio
       stopAlarm(timer.id);
+      stopAlarmPlaying(timer.id);
+      
+      // Use setTimeout to ensure alarm state is updated before deletion
+      setTimeout(() => {
+        deleteTimer(timer.id);
+      }, 0);
+    } else {
+      deleteTimer(timer.id);
     }
-    deleteTimer(timer.id);
   };
 
   const handleToggle = () => {

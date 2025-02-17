@@ -21,12 +21,12 @@ export const useAlarm = () => {
         label: 'Dismiss',
         onClick: () => {
           stopAlarmPlaying(timerId);
-          
-          // Check if any timers are still playing alarms
-          const hasActiveAlarms = timers.some(t => t.isPlayingAlarm);
-          if (!hasActiveAlarms) {
-            timerAudio.stop();
-          }
+          setTimeout(() => {
+            const activeAlarms = timers.filter(t => t.isPlayingAlarm);
+            if (activeAlarms.length === 0) {
+              timerAudio.stop();
+            }
+          }, 0);
           
           toast.dismiss(toastId);
         },
@@ -39,11 +39,12 @@ export const useAlarm = () => {
   const stopAlarm = useCallback((timerId: string) => {
     stopAlarmPlaying(timerId);
     
-    // Check if any timers are still playing alarms
-    const hasActiveAlarms = timers.some(t => t.isPlayingAlarm);
-    if (!hasActiveAlarms) {
-      timerAudio.stop();
-    }
+    setTimeout(() => {
+      const activeAlarms = timers.filter(t => t.isPlayingAlarm);
+      if (activeAlarms.length === 0) {
+        timerAudio.stop();
+      }
+    }, 0);
   }, [stopAlarmPlaying, timerAudio, timers]);
 
   return {
