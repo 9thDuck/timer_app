@@ -102,7 +102,7 @@ export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
             </div>
           </div>
           <div className="flex flex-col items-center mt-6">
-            <div className="text-4xl font-mono font-bold text-gray-800 mb-4">
+            <div className="text-4xl font-['Roboto_Mono'] font-bold text-gray-800 mb-4">
               {formatTime(timer.remainingTime)}
             </div>
             
