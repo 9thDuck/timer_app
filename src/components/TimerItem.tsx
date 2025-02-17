@@ -7,6 +7,7 @@ import { TimerControls } from './TimerControls';
 import { TimerProgress } from './TimerProgress';
 import { TimerModal } from './TimerModal';
 import { useAlarm } from '../hooks/useAlarm';
+import { Button } from './Button';
 
 interface TimerItemProps {
   timer: Timer;
@@ -78,27 +79,24 @@ export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
               <p className="text-gray-600 mt-1">{timer.description}</p>
             </div>
             <div className="flex gap-2">
-              <button
+              <Button
+                variant="icon"
                 onClick={() => setIsEditModalOpen(true)}
-                className="p-2 rounded-full hover:bg-blue-50 text-blue-500 transition-colors"
                 title="Edit Timer"
-              >
-                <Pencil className="w-5 h-5" />
-              </button>
-              <button
+                icon={Pencil}
+              />
+              <Button
+                variant="icon"
                 onClick={handleRestart}
-                className="p-2 rounded-full hover:bg-blue-50 text-blue-500 transition-colors"
                 title="Restart Timer"
-              >
-                <RotateCcw className="w-5 h-5" />
-              </button>
-              <button
+                icon={RotateCcw}
+              />
+              <Button
+                variant="danger"
                 onClick={handleDelete}
-                className="p-2 rounded-full hover:bg-red-50 text-red-500 transition-colors"
                 title="Delete Timer"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+                icon={Trash2}
+              />
             </div>
           </div>
           <div className="flex flex-col items-center mt-6">
