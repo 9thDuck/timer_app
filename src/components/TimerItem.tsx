@@ -30,10 +30,13 @@ export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
           timerAudio.play().catch(console.error);
           
           toast.success(`Timer "${timer.title}" has ended!`, {
-            duration: 5000,
+            duration: Infinity,
             action: {
               label: 'Dismiss',
-              onClick: timerAudio.stop,
+              onClick: () => {
+                timerAudio.stop();
+                toast.dismiss()
+              },
             },
           });
         }
@@ -54,6 +57,7 @@ export const TimerItem: React.FC<TimerItemProps> = ({ timer }) => {
   };
 
   const handleToggle = () => {
+    console.log('handleToggle', timer.duration, timer.remainingTime);
     if (timer.remainingTime <= 0) {
       hasEndedRef.current = false;
     }
